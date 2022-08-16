@@ -24,7 +24,7 @@ import datetime
 from psutil import Process
 from utils.io_tools import change_extension, load_binary, mkpath
 from utils.sodef import bimef
-from utils.array_tools import float32_to_uint8, autoscale_array, array_info
+from utils.array_tools import float32_to_uint8, uint8_to_float32, autoscale_array, array_info
 from psutil import virtual_memory, swap_memory, Process
 from utils.logging import timestamp
 import os
