@@ -12,7 +12,6 @@ footer {visibility: hidden;}
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 
-#st.markdown("Main page")
 #DEFAULT_DIR_PATH = f'C:\GIT_REPOS\BIMEF_MF{VERSION}\DOWNLOADS'
 DEFAULT_DIR_PATH = f'DOWNLOADS'
 
@@ -31,19 +30,6 @@ import os
 from os import getpid
 import sys
 from PIL import Image, ImageOps
-#sys.path.insert(1, os.path.join(sys.path[0], '..'))
-#python_dir = r'C:\CODE\PYTHON'
-#sys.path.insert(1,python_dir)
-
-#from sodef import view_memory, timestamp, float32_to_uint8
-#from sodef import #log_memory, entropy, xentropy, kl_divergence, autoscale_array, array_info, print_array_info, geometric_mean
-#from sodef.sodef import sodef
-
-#from sodef import calculate_texture_weights_I #, calculate_texture_weights_II, calculate_texture_weights_III, calculate_texture_weights_IV, calculate_texture_weights_V
-#from sodef import joint_entropy, mutual_information, variation_of_information
-#from sodef import normalized_variation_of_information, conditional_entropy
-
-                
 
 # def reset_calculation(condition, x):
 #     if st.session_state.live_updates == 'Automatic':
@@ -57,20 +43,30 @@ from PIL import Image, ImageOps
 #     if name not in st.session_state:
 #         st.session_state.name = value
 
-
-
-
-#@st.cache(max_entries=1, show_spinner=False, suppress_st_warning=True)
-#@st.cache(show_spinner=False, suppress_st_warning=True)
 #@st.experimental_memo
 def adjust_intensity(array, 
-                     exposure_ratio=-1, enhance=0.8, 
-                     a=-0.3293, b=1.1258, lamda=0.3, 
+                     exposure_ratio=-1, 
+                     enhance=0.8, 
+                     a=-0.3293, 
+                     b=1.1258, 
+                     lamda=0.3, 
                      texture_style='I',
-                     kernel_shape=(5,1), scale=0.1, sharpness=0.001, 
-                     dim_threshold=0.5, dim_size=(50,50), 
-                     solver='cg', CG_prec='ILU', CG_TOL=0.1, LU_TOL=0.015, MAX_ITER=50, FILL=50, 
-                     lo=1, hi=7, color_gamma=0.5, npoints=20, return_texture_weights=True
+                     kernel_shape=(5,1), 
+                     scale=0.1, 
+                     sharpness=0.001, 
+                     dim_threshold=0.5, 
+                     dim_size=(50,50), 
+                     solver='cg', 
+                     CG_prec='ILU', 
+                     CG_TOL=0.1, 
+                     LU_TOL=0.015, 
+                     MAX_ITER=50, 
+                     FILL=50, 
+                     lo=1, 
+                     hi=7, 
+                     color_gamma=0.5, 
+                     npoints=20, 
+                     return_texture_weights=True
                      ):
     
     '''
@@ -101,20 +97,21 @@ def adjust_intensity(array,
                  npoints=npoints, 
                  return_texture_weights=return_texture_weights) 
 
-SCRAPYARD_FILE_PATH = 'examples/scrapyard.jpg'
-SELFIE_FILE_PATH = 'examples/selfie.jpg'
-CYLINDER_FILE_PATH = 'examples/cylinder.jpg'
-PARK_FILE_PATH = 'examples/park.jpg'
-SCHOOL_FILE_PATH = 'examples/school.jpg'
-SPIRAL_FILE_PATH = 'examples/spiral.jpg'
+SCRAPYARD_FILE_NAME = 'scrapyard.jpg'
+SELFIE_FILE_NAME = 'selfie.jpg'
+CYLINDER_FILE_NAME = 'cylinder.jpg'
+PARK_FILE_NAME = 'park.jpg'
+SCHOOL_FILE_NAME = 'school.jpg'
+SPIRAL_FILE_NAME = 'spiral.jpg'
 
+EXAMPLES_DIR_PATH = 'examples'
 
-# SCRAPYARD_FILE_PATH = '.\\examples\\scrapyard.jpg'
-# SELFIE_FILE_PATH = '.\\examples\\selfie.jpg'
-# CYLINDER_FILE_PATH = '.\\examples\\cylinder.jpg'
-# PARK_FILE_PATH = '.\\examples\\park.jpg'
-# SCHOOL_FILE_PATH = '.\\examples\\school.jpg'
-# SPIRAL_FILE_PATH = '.\\examples\\spiral.jpg'
+SCRAPYARD_FILE_PATH = os.path.join(EXAMPLES_DIR_PATH, SCRAPYARD_FILE_NAME)
+SELFIE_FILE_PATH = os.path.join(EXAMPLES_DIR_PATH, SELFIE_FILE_NAME)
+CYLINDER_FILE_PATH = os.path.join(EXAMPLES_DIR_PATH, CYLINDER_FILE_NAME)
+PARK_FILE_PATH = os.path.join(EXAMPLES_DIR_PATH, PARK_FILE_NAME)
+SCHOOL_FILE_PATH = os.path.join(EXAMPLES_DIR_PATH, SCHOOL_FILE_NAME)
+SPIRAL_FILE_PATH = os.path.join(EXAMPLES_DIR_PATH, SPIRAL_FILE_NAME)
 
 def limit_cache():
     if 'limit_cache_use' not in st.session_state:
@@ -136,7 +133,6 @@ def reset():
     if st.session_state.limit_cache_use:
         clear_cache()
 
-
 def full_reset():
     if 'image_np' in st.session_state:
         del st.session_state.image_np
@@ -147,8 +143,6 @@ def full_reset():
         clear_cache()
 
     st.session_state.full_clear = True
-
-
 
 def run_app(default_power=0.5, 
             default_smoothness=0.3, 
@@ -208,7 +202,6 @@ def run_app(default_power=0.5,
                 submitted = st.form_submit_button('Apply')
                 ################################################################################################
                 ################### GUI PARAMETERS #########################################################
-                #speed = float(st.text_input(f'Speed   (default = {default_speed})', str(default_speed), on_change=reset_calculation, args=(st.session_state.live_updates == 'Automatic', 'ai_out')))
                 granularity_selection = st.radio("Illumination detail", ('standard', 'boost', 'max'), horizontal=True)
                 granularity_dict = {'standard': 0.1, 'boost': 0.3, 'max': 0.5}
                 granularity = granularity_dict[granularity_selection]
@@ -235,41 +228,23 @@ def run_app(default_power=0.5,
                             }
 
                 texture_style, cg_tol, lu_tol, max_iter, fill = texture_weight_calculator_dict[texture_weight_calculator]
-              #  if speed <= 2:
-              #      fill *= 2
 
-        checkbox = st.checkbox('Show Mid-Process Images')
+        checkbox = st.checkbox('Show Process Images')
 
     col1, col2, col3 = st.columns(3)
 
     if fImage is not None:
-
         st.session_state.input_file_name = str(fImage.__dict__['name'])
-        #st.session_state.image_currently_loaded = True
-       
-        #log_memory('run_app|np.frombuffer|B')
         np_array = np.frombuffer(fImage.getvalue(), np.uint8)
-        #log_memory('run_app|np.frombuffer|E')
-        #log_memory('run_app|cv2.imdecode|B')
         st.session_state.image_np = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
-        #log_memory('run_app|cv2.imdecode|E')
-
-        # #st.session_state.image_np = image_np
-
-        # st.session_state.input_file_name = input_file_name
-        # if 'ai_out' in st.session_state:         
-        #     del st.session_state['ai_out']
-    
     else:
-
         st.session_state.input_file_name = IMAGE_EXAMPLE_PATH.split('\\')[-1]
         st.session_state.image_np = np.array(ImageOps.exif_transpose(Image.open(IMAGE_EXAMPLE_PATH)))[:,:,[2,1,0]]
 
     if 'image_np' in st.session_state:
-
         image_np = st.session_state.image_np
         input_file_name = st.session_state.input_file_name
-        #########################################################################################################
+
         #########################################################################################################
         start = datetime.datetime.now()
         #log_memory('run_app|adjust_intensity|B')
@@ -300,6 +275,7 @@ def run_app(default_power=0.5,
         end = datetime.datetime.now()
         process_time = (end - start).total_seconds()
         print(f'[{datetime.datetime.now().isoformat()}]  Processing time: {process_time:.5f} s')
+        sys.stdout.flush()
         #########################################################################################################
 
         image_np_L1_map = np.abs(image_np_gradient_v * image_np_texture_weights_v + image_np_gradient_h * image_np_texture_weights_h)
@@ -315,7 +291,6 @@ def run_app(default_power=0.5,
         image_np_wls_map = np.tile(image_np_wls_map.T, (3,1,1)).T
 
         image_np_fine_texture_map = float32_to_uint8(image_np_maxRGB - illumination_map)
-        #image_np_fine_texture_map_info_str = array_info(image_np_fine_texture_map, print_info=True, name='image_np_fine_texture_map_info_str')#, return_info=True, return_info_str=True)
         image_np_fine_texture_map = np.tile(image_np_fine_texture_map.T, (3,1,1)).T
 
         illumination_map = float32_to_uint8(illumination_map)
@@ -323,22 +298,6 @@ def run_app(default_power=0.5,
 
         fusion_weights = float32_to_uint8(fusion_weights)
         fusion_weights = np.tile(fusion_weights.T, (3,1,1)).T
-
-        # array_info(image_np_maxRGB, print_info=True, name='image_np_maxRGB')
-        # array_info(image_np_gradient_v, print_info=True, name='image_np_gradient_v')
-        # array_info(image_np_gradient_h, print_info=True, name='image_np_gradient_h')
-        # array_info(image_np_texture_weights_v, print_info=True, name='image_np_texture_weights_v')
-        # array_info(image_np_texture_weights_h, print_info=True, name='image_np_texture_weights_h')
-        # array_info(image_np_wls_map, print_info=True, name='image_np_wls_map')
-        # array_info(illumination_map, print_info=True, name='illumination_map')
-
-        # array_info(fusion_weights, print_info=True, name='fusion_weights')
-        # array_info(image_exposure_maxent, print_info=True, name='image_exposure_maxent')
-        # array_info(image_np_simulation, print_info=True, name='image_np_simulation')
-        # array_info(image_np_L1_map, print_info=True, name='image_L1_map')
-        # array_info(image_np_fine_texture_map, print_info=True, name='image_np_fine_texture_map')
-        # array_info(image_np_fused, print_info=True, name='image_np_fused')
-
 
         # gradient
         granularity_param_str = f'_{granularity*100:.0f}'
@@ -369,62 +328,37 @@ def run_app(default_power=0.5,
         
 
         with col1:        
-
-            ###########################
-            # st.header(f'Original Image')
-            # #log_memory('run_app|st.image|B')
-            # st.image(image_np[:,:,[2,1,0]])
-            # #log_memory('run_app|st.image|E')
-
-            # #checkbox = st.checkbox('download')
-            # #if checkbox:
-            # input_file_name = st.text_input('Download Original Image As', input_file_name)
-            # ext = '.' + input_file_name.split('.')[-1]
-            # #log_memory('run_app|cv2.imencode|B')
-            # image_np_binary = cv2.imencode(ext, st.session_state['image_np'])[1].tobytes()
-            # #log_memory('run_app|cv2.imencode|E')
-            # #button = BigButton(label = "Download Original Image", data = image_np_binary, file_name = input_file_name, mime = "image/png")
-            # #button = st.download_button(label = "Download Original Image", data = image_np_binary, file_name = input_file_name, mime = "image/png")
-            # data = b'0'
-            # button = st.download_button(label = "Download Original Image", data = image_np_binary, file_name = input_file_name, mime = "image/png", on_click=load_binary, args=(ext, st.session_state['image_np'], data))
             
             ###########################
             st.markdown("<h3 style='text-align: center; color: white;'>Original</h3>", unsafe_allow_html=True)
-            #st.header(f'Original')
             #log_memory('run_app|st.image|B')
             st.image(image_np[:,:,[2,1,0]])
             #log_memory('run_app|st.image|E')
 
-            #checkbox = st.checkbox('download')
-            #if checkbox:
             input_file_name = st.text_input('Download Original Image As', input_file_name)
             ext = '.' + input_file_name.split('.')[-1]
             #log_memory('run_app|cv2.imencode|B')
             image_np_binary = cv2.imencode(ext, image_np)[1].tobytes()
             #log_memory('run_app|cv2.imencode|E')
-            #button = BigButton(label = "Download Original Image", data = image_np_binary, file_name = input_file_name, mime = "image/png")
-            #button = st.download_button(label = "Download Original Image", data = image_np_binary, file_name = input_file_name, mime = "image/png")
-            #data = b'0'
             button = st.download_button(label = "Download Original Image", data = image_np_binary, file_name = input_file_name, mime = "image/png")
 
             if checkbox:
                 ###########################
-                st.header(f'WLS Map')
+                st.markdown("<h3 style='text-align: center; color: white;'>Texture Weights</h3>", unsafe_allow_html=True)
                 #log_memory('run_app|st.image|B')    
                 st.image(image_np_wls_map, clamp=True)
                 #log_memory('run_app|st.image|E')
 
-                output_wls_map_file_name = st.text_input('Download WLS Map As', output_wls_map_file_name)
+                output_wls_map_file_name = st.text_input('Download Texture Weights As', output_wls_map_file_name)
                 ext = '.' + output_wls_map_file_name.split('.')[-1]
                 #log_memory('run_app|cv2.imencode|B')           
-                #image_np_wls_map_binary = cv2.imencode(ext, image_np_wls_map[:,:,[2,1,0]])[1].tobytes()
                 image_np_wls_map_binary = load_binary(ext, image_np_wls_map, color_channel='bgr')
                 #log_memory('run_app|cv2.imencode|E')
 
-                button = st.download_button(label = "Download WLS Map", data = image_np_wls_map_binary, file_name = output_wls_map_file_name, mime = "image/png")
+                button = st.download_button(label = "Download Texture Weights", data = image_np_wls_map_binary, file_name = output_wls_map_file_name, mime = "image/png")
                 
                 ###########################
-                st.header(f'L1 Map')
+                st.markdown("<h3 style='text-align: center; color: white;'>Regularization</h3>", unsafe_allow_html=True)
                 #log_memory('run_app|st.image|B')
                 st.image(image_np_L1_map, clamp=True)
                 #log_memory('run_app|st.image|E')
@@ -439,8 +373,7 @@ def run_app(default_power=0.5,
 
         with col2:
         ###########################
-            st.markdown("<h3 style='text-align: center; color: white;'>Simulation</h3>", unsafe_allow_html=True)
-            #st.header(f'Simulation')
+            st.markdown("<h3 style='text-align: center; color: white;'>Enhancement</h3>", unsafe_allow_html=True)
             #log_memory('run_app|st.image|B')            
             st.image(image_np_simulation, clamp=True)
             #log_memory('run_app|st.image|E')
@@ -456,6 +389,7 @@ def run_app(default_power=0.5,
             if checkbox:
 
                 ###########################
+                st.markdown("<h3 style='text-align: center; color: white;'>Illumination Map</h3>", unsafe_allow_html=True)
                 st.header(f'Illumination Map')
                 #log_memory('run_app|st.image|B')            
                 st.image(illumination_map, clamp=True)
@@ -470,7 +404,7 @@ def run_app(default_power=0.5,
                 button = st.download_button(label = "Download Illumination Map", data = illumination_map_binary, file_name = output_illumination_map_file_name, mime = "image/png")
 
                 ###########################
-                st.header(f'Fusion Weights')
+                st.markdown("<h3 style='text-align: center; color: white;'>Fusion Weights</h3>", unsafe_allow_html=True)
                 #log_memory('run_app|st.image|B')            
                 st.image(fusion_weights, clamp=True)
                 #log_memory('run_app|st.image|E')
@@ -486,8 +420,7 @@ def run_app(default_power=0.5,
         with col3:
 
             ###########################
-            st.markdown("<h3 style='text-align: center; color: white;'>Fusion</h3>", unsafe_allow_html=True)
-            #st.header(f'Fusion')
+            st.markdown("<h3 style='text-align: center; color: white;'>Fixed</h3>", unsafe_allow_html=True)
             #log_memory('run_app|st.image|B')            
             st.image(image_np_fused, clamp=True)
             #log_memory('run_app|st.image|E')
@@ -503,7 +436,7 @@ def run_app(default_power=0.5,
             if checkbox:
 
                 ###########################
-                st.header(f'MaxEnt Exposure')
+                st.markdown("<h3 style='text-align: center; color: white;'>MaxEnt Exposure</h3>", unsafe_allow_html=True)
                 #log_memory('run_app|st.image|B')            
                 st.image(image_exposure_maxent, clamp=True)
                 #log_memory('run_app|st.image|E')
@@ -511,13 +444,12 @@ def run_app(default_power=0.5,
                 output_exposure_maxent_file_name = st.text_input('Download Maxent Exposure As', output_exposure_maxent_file_name)
                 ext = '.' + output_exposure_maxent_file_name.split('.')[-1]
                 #log_memory('run_app|cv2.imencode|B')
-                #image_exposure_maxent_binary = cv2.imencode(ext, image_exposure_maxent[:,:,[2,1,0]])[1].tobytes()
                 image_exposure_maxent_binary = load_binary(ext, image_exposure_maxent, color_channel='bgr')
                 #log_memory('run_app|cv2.imencode|E')
 
                 button = st.download_button(label = "Download Maxent Exposure", data = image_exposure_maxent_binary, file_name = output_exposure_maxent_file_name, mime = "image/png")            
                 ###########################
-                st.header(f'Fine Texture Map')
+                st.markdown("<h3 style='text-align: center; color: white;'>Fine Texture Map</h3>", unsafe_allow_html=True)
                 #log_memory('run_app|st.image|B')   
                 st.image(image_np_fine_texture_map, clamp=True)
                 #log_memory('run_app|st.image|E')
@@ -530,23 +462,16 @@ def run_app(default_power=0.5,
 
                 button = st.download_button(label = "Download Fine Texture Map", data = image_np_fine_texture_map_binary, file_name = output_fine_texture_map_file_name, mime = "image/png")
 
-            # else:                
-            #     with st.form("Show MaxEnt Exposure & Fine Texture Map"):
-            #         if st.form_submit_button('Show MaxEnt Exposure & Fine Texture Map'):
-            #             st.header(f'MaxEnt Exposure')       
-            #             st.image(image_exposure_maxent, clamp=True)
-            #             st.header(f'Fine Texture Map')
-            #             st.image(image_np_fine_texture_map, clamp=True)
 
         st.text('\n\n\n\n\n\n\n\n')
-        st.text('*Supported file extensions: jpg, jpeg, png, gif, bmp, pdf, svg, eps')
+        st.markdown("<h5 style='text-align: center; color: white;'>*Supported file extensions: jpg, jpeg, png, gif, bmp, pdf, svg, eps</h5>", unsafe_allow_html=True)
+        #st.text('*Supported file extensions: jpg, jpeg, png, gif, bmp, pdf, svg, eps')
         st.text('\n\n\n\n\n\n\n\n')
 
         with st.sidebar:
             
             if st.checkbox("View Image Info"):
                 col_left, col_mid, col_right = st.columns(3)
-
 
                 #log_memory('run_app|array_info|B')
                 image_np_info, image_np_info_str = array_info(image_np, print_info=False, return_info=True, return_info_str=True, name='Original Image')
@@ -567,35 +492,7 @@ def run_app(default_power=0.5,
                 st.text("\n\n\n\n\n")
                
                 st.text(image_np_fused_info_str)
-                st.text(image_np_fused_info['bytes'])
-
-                
-                image_maxent_info, image_maxent_info_str = array_info(image_exposure_maxent, print_info=False, return_info=True, return_info_str=True, name='MaxEnt Image')
-                st.text("\n\n\n\n\n")
-                st.text(image_maxent_info_str)
-
-                
-                # if st.checkbox("Advanced"):
-                #     #log_memory('run_app|show_statistics|E')
-
-
-
-                #     kl = kl_divergence(image_np, image_np_fused)
-                #     js = js_divergence(image_np, image_np_fused)
-                #     s_joint = joint_entropy(image_np, image_np_fused)
-                #     i_mutual = mutual_information(image_np, image_np_fused)
-                #     voi = variation_of_information(image_np, image_np_fused)
-                #     nvoi = normalized_variation_of_information(image_np, image_np_fused)
-
-                #     st.text("\n\n\n\n\n")
-
-                #     st.text(f'KL divergence: {kl:.4f}')
-                #     st.text(f'JS divergence: {js:.4f}')
-                #     st.text(f'joint entropy: {s_joint:.4f}')
-                #     st.text(f'mutual information: {i_mutual:.4f}')
-                #     st.text(f'variation of information (VOI): {voi:.4f}')
-                #     st.text(f'normalized VOI: {nvoi:.4f}\n')
-            
+     
             with st.expander("Resource Settings"):
                 checkbox_limit_cache = st.checkbox('Limit Caching', on_change=limit_cache, 
                                                    help="Purge existing subprocess results from cache whenever a new image is loaded.  \
@@ -620,10 +517,7 @@ def run_app(default_power=0.5,
                 dir_path = st.text_input('Folder Name:', default_dir_path)
 
                 last_download_time = '-'
-            # with colII:
-            #    info = array_info(image_np, print_info=False, return_info=True, return_info_str=False)
-            #    st.text(f"\n\n  height: {info['shape'][0]}\n  width:  {info['shape'][1]}\n        ")
- 
+
             colA, colB, colC, colD, colE = st.columns(5)
             with colA:
                 ext_batch = st.text_input('File extension:', 'jpg')
@@ -641,7 +535,6 @@ def run_app(default_power=0.5,
                 st.text('\n')
                 st.text('\n')
                 if st.form_submit_button('DOWNLOAD ALL', on_click=mkpath, args=[dir_path]):
-                #if st.button('DOWNLOAD ALL', on_click=mkpath, args=[dir_path]):
                     #log_memory('run_app|download all|B')
                     mkpath(dir_path)
                     img.imsave(change_extension(wls_map_fullpath, ext_batch), image_np_wls_map)
@@ -672,6 +565,7 @@ if __name__ == '__main__':
     total_end = datetime.datetime.now()
     total_process_time = (total_end - total_start).total_seconds()
     print(f'[{timestamp()}]  Total processing time: {total_process_time:.5f} s')
+    sys.stdout.flush()
     # gc.collect()
     # snapshot2 = tracemalloc.take_snapshot()
     # top_stats = snapshot2.compare_to(snapshot1, 'lineno')

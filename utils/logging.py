@@ -11,9 +11,10 @@ import sys
 def log_variable_size(var_name, x):
     s = sys.getsizeof(x)/float(2**20)
     print(f'Size of {var_name}: {s:.2f} MB')
+    sys.stdout.flush()
 
 def timestamp():
-  return datetime.datetime.now().isoformat() #strftime("%Y%m%d_%H%M%S")
+    return datetime.datetime.now().isoformat() #strftime("%Y%m%d_%H%M%S")
 
 def log_memory(ref_id):
     pid = os.getpid()
@@ -22,6 +23,7 @@ def log_memory(ref_id):
     swap = psutil.swap_memory()[1]/float(2**20)
 
     print(f'[{timestamp()}]  [{ref_id}|{pid}]    rss: {mem:.2f} MB  (virtual: {virt:.2f} MB, swap: {swap:.2f} MB)')
+    sys.stdout.flush()
 
 
 def runtime(f):
@@ -55,6 +57,7 @@ def log_memory(ref_id):
     swap = psutil.swap_memory()[1]/float(2**20)
 
     print(f'[{timestamp()}]  [{ref_id}|{pid}]    rss: {mem:.2f} MB  (virtual: {virt:.2f} MB, swap: {swap:.2f} MB)')
+    sys.stdout.flush()
 
 def view_memory(f):
     '''

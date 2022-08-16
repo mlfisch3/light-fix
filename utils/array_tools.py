@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 from PIL import Image
+from pympler import asizeof
 from utils.array_entropy import entropy
 
 def float32_to_uint8(array):
@@ -153,7 +154,8 @@ def array_info(array, print_info=True, return_info=False, return_info_str=False,
     '''
     info = {}
     info['name'] = str(name)
-    info['bytes'] = sys.getsizeof(array)
+    #info['bytes'] = sys.getsizeof(array)
+    info['bytes'] = asizeof.asizeof(array)
     info['dtype'] = array.dtype
     info['ndim'] = array.ndim
     info['shape'] = array.shape
