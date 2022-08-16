@@ -100,13 +100,20 @@ def adjust_intensity(array,
                  npoints=npoints, 
                  return_texture_weights=return_texture_weights) 
 
+SCRAPYARD_FILE_PATH = 'examples/scrapyard.jpg'
+SELFIE_FILE_PATH = 'examples/selfie.jpg'
+CYLINDER_FILE_PATH = 'examples/cylinder.jpg'
+PARK_FILE_PATH = 'examples/park.jpg'
+SCHOOL_FILE_PATH = 'examples/school.jpg'
+SPIRAL_FILE_PATH = 'examples/spiral.jpg'
 
-SCRAPYARD_FILE_PATH = '.\\examples\\scrapyard.jpg'
-SELFIE_FILE_PATH = '.\\examples\\selfie.jpg'
-CYLINDER_FILE_PATH = '.\\examples\\cylinder.jpg'
-PARK_FILE_PATH = '.\\examples\\park.jpg'
-SCHOOL_FILE_PATH = '.\\examples\\school.jpg'
-SPIRAL_FILE_PATH = '.\\examples\\spiral.jpg'
+
+# SCRAPYARD_FILE_PATH = '.\\examples\\scrapyard.jpg'
+# SELFIE_FILE_PATH = '.\\examples\\selfie.jpg'
+# CYLINDER_FILE_PATH = '.\\examples\\cylinder.jpg'
+# PARK_FILE_PATH = '.\\examples\\park.jpg'
+# SCHOOL_FILE_PATH = '.\\examples\\school.jpg'
+# SPIRAL_FILE_PATH = '.\\examples\\spiral.jpg'
 
 def limit_cache():
     if 'limit_cache_use' not in st.session_state:
