@@ -20,16 +20,16 @@ import cv2
 import numpy as np
 from matplotlib import image as img
 import datetime
-from psutil import Process
-from utils.io_tools import change_extension, load_binary, mkpath
-from utils.sodef import bimef
-from utils.array_tools import float32_to_uint8, uint8_to_float32, autoscale_array, array_info
 from psutil import virtual_memory, swap_memory, Process
-from utils.logging import timestamp
 import os
 from os import getpid
 import sys
+import gc
 from PIL import Image, ImageOps
+from utils.io_tools import change_extension, load_binary, mkpath
+from utils.sodef import bimef
+from utils.array_tools import float32_to_uint8, uint8_to_float32, autoscale_array, array_info
+from utils.logging import timestamp
 
 # def reset_calculation(condition, x):
 #     if st.session_state.live_updates == 'Automatic':
@@ -143,6 +143,7 @@ def full_reset():
         clear_cache()
 
     st.session_state.full_clear = True
+    gc.collect()
 
 def run_app(default_power=0.5, 
             default_smoothness=0.3, 
@@ -464,7 +465,7 @@ def run_app(default_power=0.5,
 
 
         st.text('\n\n\n\n\n\n\n\n')
-        st.markdown("<h5 style='text-align: center; color: white;'>*Supported file extensions: jpg, jpeg, png, gif, bmp, pdf, svg, eps</h5>", unsafe_allow_html=True)
+        st.markdown("<h6 style='text-align: left; color: white;'>*Supported file extensions: jpg, jpeg, png, gif, bmp, pdf, svg, eps</h6>", unsafe_allow_html=True)
         #st.text('*Supported file extensions: jpg, jpeg, png, gif, bmp, pdf, svg, eps')
         st.text('\n\n\n\n\n\n\n\n')
 
