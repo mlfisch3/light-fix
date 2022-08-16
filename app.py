@@ -374,7 +374,7 @@ def run_app(default_power=0.5,
 
         with col2:
         ###########################
-            st.markdown("<h3 style='text-align: center; color: white;'>Enhancement</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align: center; color: white;'>Simulation</h3>", unsafe_allow_html=True)
             #log_memory('run_app|st.image|B')            
             st.image(image_np_simulation, clamp=True)
             #log_memory('run_app|st.image|E')
@@ -421,7 +421,7 @@ def run_app(default_power=0.5,
         with col3:
 
             ###########################
-            st.markdown("<h3 style='text-align: center; color: white;'>Fixed</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align: center; color: white;'>Fused</h3>", unsafe_allow_html=True)
             #log_memory('run_app|st.image|B')            
             st.image(image_np_fused, clamp=True)
             #log_memory('run_app|st.image|E')
