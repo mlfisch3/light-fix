@@ -129,10 +129,6 @@ def reset():
         clear_cache()
 
 
-if 'full_clear' not in st.session_state:
-    st.session_state.full_clear = False
-
-
 def full_reset():
     if 'image_np' in st.session_state:
         del st.session_state.image_np
@@ -166,6 +162,9 @@ def run_app(default_power=0.5,
             default_color_gamma=0.3981):
 
     
+    if 'full_clear' not in st.session_state:
+        st.session_state.full_clear = False
+
     if 'limit_cache_use' not in st.session_state:
         st.session_state.limit_cache_use = False
 
