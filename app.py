@@ -391,7 +391,6 @@ def run_app(default_power=0.5,
 
                 ###########################
                 st.markdown("<h3 style='text-align: center; color: white;'>Illumination Map</h3>", unsafe_allow_html=True)
-                st.header(f'Illumination Map')
                 #log_memory('run_app|st.image|B')            
                 st.image(illumination_map, clamp=True)
                 #log_memory('run_app|st.image|E')

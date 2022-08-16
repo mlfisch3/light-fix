@@ -5,7 +5,7 @@ from utils.array_entropy import entropy
 from utils.array_tools import geometric_mean, imresize, autoscale_array
 
 #### Exposure Functions
-@st.experimental_memo(show_spinner=False)
+#@st.experimental_memo(show_spinner=False)
 def applyK(G, k, a=-0.3293, b=1.1258, verbose=False):
     #log_memory('applyK||B')
     if k==1.0:
@@ -23,7 +23,7 @@ def applyK(G, k, a=-0.3293, b=1.1258, verbose=False):
     return (np.power(G,gamma)*beta).astype(np.float32)
 
 
-@st.experimental_memo(show_spinner=False)
+#@st.experimental_memo(show_spinner=False)
 def get_dim_pixels(image,dim_pixels,dim_size=(50,50)):
     #log_memory('get_dim_pixels||B')
     dim_pixels = imresize(dim_pixels,size=dim_size)
@@ -34,7 +34,7 @@ def get_dim_pixels(image,dim_pixels,dim_size=(50,50)):
     #log_memory('get_dim_pixels||E')
     return Y[dim_pixels]
 
-@st.experimental_memo(show_spinner=False)
+#@st.experimental_memo(show_spinner=False)
 def optimize_exposure_ratio(array, a, b, lo=1, hi=7, npoints=20):
     #log_memory('optimize_exposure_ratio||B')  
     if sum(array.shape)==0:
@@ -49,7 +49,7 @@ def optimize_exposure_ratio(array, a, b, lo=1, hi=7, npoints=20):
 
     return fusion_weights
 
-@st.experimental_memo(show_spinner=False)
+#@st.experimental_memo(show_spinner=False)
 def adjust_exposure(image, illumination_map, a, b, exposure_ratio=-1, dim_threshold=0.5, dim_size=(50,50), lo=1, hi=7, npoints=20, color_gamma=0.3981, verbose=False):
     #log_memory('bimef|autoscale_array|B')
     image_01 = autoscale_array(image)

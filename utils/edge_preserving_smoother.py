@@ -77,7 +77,7 @@ def calculate_texture_weights(image_01_maxRGB_reduced, kernel_shape=(5,1), sharp
         return gradient_v, gradient_h, texture_weights_v, texture_weights_h
 
 
-@st.experimental_memo(show_spinner=False)
+#@st.experimental_memo(show_spinner=False)
 def construct_map_cyclic(texture_weights_v, texture_weights_h, lamda):
     ''' all cyclic elements present '''
     #log_memory('construct_map||B')  
@@ -171,7 +171,7 @@ def solve_sparse_system(A, B, method='cg', CG_prec='ILU', CG_TOL=0.1, LU_TOL=0.0
         return spsolve(A, b).astype(np.float32).reshape(r,c, order='F')
 
 #### Illumination Map Function 
-@st.experimental_memo(show_spinner=False)
+#@st.experimental_memo(show_spinner=False)
 def smooth(image_01_maxRGB_reduced, restore_shape, texture_style='I', kernel_shape=(5,1), sharpness=0.001, lamda=0.5, solver='cg', CG_prec='ILU', CG_TOL=0.1, LU_TOL=0.015, MAX_ITER=50, FILL=50, return_texture_weights=False):
     #log_memory('smooth||B')  
     ############ TEXTURE MAP  ###########################
