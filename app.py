@@ -13,7 +13,8 @@ footer {visibility: hidden;}
 st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
 
 #st.markdown("Main page")
-DEFAULT_DIR_PATH = f'C:\GIT_REPOS\BIMEF_MF{VERSION}\DOWNLOADS'
+#DEFAULT_DIR_PATH = f'C:\GIT_REPOS\BIMEF_MF{VERSION}\DOWNLOADS'
+DEFAULT_DIR_PATH = f'DOWNLOADS'
 
 #st.write(st.session_state)
 import cv2
