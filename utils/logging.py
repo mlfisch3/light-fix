@@ -22,6 +22,7 @@ def log_memory(ref_id):
     virt = psutil.virtual_memory()[3]/float(2**20)
     swap = psutil.swap_memory()[1]/float(2**20)
 
+    # rss == "resident memory"
     print(f'[{timestamp()}]  [{ref_id}|{pid}]    rss: {mem:.2f} MB  (virtual: {virt:.2f} MB, swap: {swap:.2f} MB)')
     sys.stdout.flush()
 
@@ -49,15 +50,6 @@ def runtime(f):
         print(f'runtime: {elapsed:.7f} s')
         return out
     return run
-
-def log_memory(ref_id):
-    pid = os.getpid()
-    mem = psutil.Process(pid).memory_info()[0]/float(2**20)
-    virt = psutil.virtual_memory()[3]/float(2**20)
-    swap = psutil.swap_memory()[1]/float(2**20)
-
-    print(f'[{timestamp()}]  [{ref_id}|{pid}]    rss: {mem:.2f} MB  (virtual: {virt:.2f} MB, swap: {swap:.2f} MB)')
-    sys.stdout.flush()
 
 def view_memory(f):
     '''

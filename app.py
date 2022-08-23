@@ -1,17 +1,5 @@
 import streamlit as st
 
-VERSION = 2
-title = f'SODEF{VERSION}'
-st.set_page_config(page_title=title, layout="wide")
-
-hide_streamlit_style = """
-<style>
-#MainMenu {visibility: visible;}
-footer {visibility: hidden;}
-</style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True) 
-
 #DEFAULT_DIR_PATH = f'C:\GIT_REPOS\BIMEF_MF{VERSION}\DOWNLOADS'
 DEFAULT_DIR_PATH = f'DOWNLOADS'
 
@@ -499,6 +487,7 @@ def run_app(default_power=0.5,
                                                    Helps protect the app from exceeding available memory resources. \
                                                    Might cause longer processing times."
                                                    )                                                 
+                gc.collect()
                 pid = getpid()
                 mem = Process(pid).memory_info()[0]/float(2**20)
                 virt = virtual_memory()[3]/float(2**20)
