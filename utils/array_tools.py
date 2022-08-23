@@ -6,7 +6,7 @@ from utils.array_entropy import entropy
 
 def float32_to_uint8(array):
     #log_memory('float32_to_uint8||B')
-    array_max = array.flatten().max()
+    array_max = array.ravel().max()
     if array_max > 1:
         array = array / array_max
     array = (255 * array).astype(np.uint8)
@@ -33,20 +33,19 @@ def cyclic_diff(x,axis=0):
 
 
 def geometric_mean(image):
-    try:
-        assert image.ndim == 3, 'Warning: Expected a 3d-array.  Returning input as-is.'
-        #image = autoscale_array(image)
-        return np.power(np.prod(image, axis=2), 1/3)
-    except AssertionError as msg:
-        print(msg)
-        return image
+    '''
+    averages along inner-most axis
+    returns 2-d array
+    '''
+    return np.power(np.prod(image, axis=image.ndim-1), 1./(image.ndim-1.))
+
 
 def autoscale_array(array):
     #log_memory('autoscale_array||B')
     #array = array.astype(np.float32)
-    lo = array.flatten().min()
+    lo = array.ravel().min()
     array -= lo    
-    hi = array.flatten().max()
+    hi = array.ravel().max()
     try:
         assert hi > 0, f'autoscale_array cannot map null array to interval [0,1]'
     except AssertionError as msg:
@@ -59,12 +58,12 @@ def autoscale_array(array):
 
 def autoscale_arrays(A, B):
 
-    lo = np.hstack([A,B]).flatten().min()
+    lo = np.hstack([A,B]).ravel().min()
     
     A = A - lo
     B = B - lo
 
-    hi = np.hstack([A,B]).flatten().max()
+    hi = np.hstack([A,B]).ravel().max()
     A = A / hi
     B = B / hi
     return A, B
@@ -122,7 +121,7 @@ def pnorm(a,p=2):
     return np.power(recsum(A),1/p)
 
 def Lp(a, p):
-    return np.power(np.power(a.flatten(), p).sum(),1/p)
+    return np.power(np.power(a.ravel(), p).sum(),1/p)
 
 def array_info(array, print_info=True, return_info=False, return_info_str=False, name=None):
     '''

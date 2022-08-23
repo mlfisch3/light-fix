@@ -267,14 +267,14 @@ def run_app(default_power=0.5,
         sys.stdout.flush()
         #########################################################################################################
 
-        image_np_L1_map = np.abs(image_np_gradient_v * image_np_texture_weights_v + image_np_gradient_h * image_np_texture_weights_h)
-        image_np_L1_map = image_np_L1_map.clip(min=0, max=image_np_L1_map.flatten().mean()+image_np_L1_map.flatten().std())
-        image_np_L1_map = float32_to_uint8(autoscale_array(image_np_L1_map))
-        image_np_L1_map = np.tile(image_np_L1_map.T, (3,1,1)).T
+        image_np_tv = np.abs(image_np_gradient_v * image_np_texture_weights_v + image_np_gradient_h * image_np_texture_weights_h)
+        image_np_tv = image_np_tv.clip(min=0, max=image_np_tv.ravel().mean()+image_np_tv.ravel().std())
+        image_np_tv = float32_to_uint8(autoscale_array(image_np_tv))
+        image_np_tv = np.tile(image_np_tv.T, (3,1,1)).T
 
         image_np_wls_map = (image_np_texture_weights_v + image_np_texture_weights_h)/2
-        image_np_wls_map_med = image_np_wls_map.flatten().mean()
-        image_np_wls_map_std = image_np_wls_map.flatten().std()
+        image_np_wls_map_med = image_np_wls_map.ravel().mean()
+        image_np_wls_map_std = image_np_wls_map.ravel().std()
         image_np_wls_map = image_np_wls_map.clip(min=image_np_wls_map_med-image_np_wls_map_std, max=image_np_wls_map_med+image_np_wls_map_std)
         image_np_wls_map = float32_to_uint8(autoscale_array(image_np_wls_map))
         image_np_wls_map = np.tile(image_np_wls_map.T, (3,1,1)).T
@@ -307,7 +307,7 @@ def run_app(default_power=0.5,
         input_file_ext = '.' + str(input_file_name.split('.')[-1])
         input_file_basename = input_file_name.replace(input_file_ext, '')
         output_wls_map_file_name = input_file_basename + '_WLS' + texture_param_str + input_file_ext
-        output_L1_map_file_name = input_file_basename + '_L1' + texture_param_str + input_file_ext
+        output_tv_file_name = input_file_basename + '_L1' + texture_param_str + input_file_ext
         output_fine_texture_map_file_name = input_file_basename + '_FTM' + smooth_param_str + input_file_ext
         output_illumination_map_file_name = input_file_basename + '_ILL' + smooth_param_str + input_file_ext
         output_simulation_file_name = input_file_basename + '_SIM' + fusion_param_str + input_file_ext
@@ -347,18 +347,18 @@ def run_app(default_power=0.5,
                 button = st.download_button(label = "Download Texture Weights", data = image_np_wls_map_binary, file_name = output_wls_map_file_name, mime = "image/png")
                 
                 ###########################
-                st.markdown("<h3 style='text-align: center; color: white;'>Regularization</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='text-align: center; color: white;'>Total Variation</h3>", unsafe_allow_html=True)
                 #log_memory('run_app|st.image|B')
-                st.image(image_np_L1_map, clamp=True)
+                st.image(image_np_tv, clamp=True)
                 #log_memory('run_app|st.image|E')
 
-                output_L1_map_file_name = st.text_input('Download L1 Map As', output_L1_map_file_name)
-                ext = '.' + output_L1_map_file_name.split('.')[-1]
+                output_tv_file_name = st.text_input('Download Total Variation As', output_tv_file_name)
+                ext = '.' + output_tv_file_name.split('.')[-1]
                 #log_memory('run_app|cv2.imencode|B')
-                image_np_L1_map_binary = cv2.imencode(ext, image_np_L1_map[:,:,[2,1,0]])[1].tobytes()
+                image_np_tv_binary = cv2.imencode(ext, image_np_tv[:,:,[2,1,0]])[1].tobytes()
                 #log_memory('run_app|cv2.imencode|E')
 
-                button = st.download_button(label = "Download L1 Map", data = image_np_L1_map_binary, file_name = output_L1_map_file_name, mime = "image/png")
+                button = st.download_button(label = "Download Total Variation", data = image_np_tv_binary, file_name = output_tv_file_name, mime = "image/png")
 
         with col2:
         ###########################
@@ -513,7 +513,7 @@ def run_app(default_power=0.5,
 
                 illumination_map_fullpath = os.path.join(dir_path,output_illumination_map_file_name)
                 wls_map_fullpath = os.path.join(dir_path, output_wls_map_file_name)
-                L1_map_fullpath = os.path.join(dir_path, output_L1_map_file_name)
+                tv_fullpath = os.path.join(dir_path, output_tv_file_name)
                 fine_texture_map_fullpath = os.path.join(dir_path, output_fine_texture_map_file_name)
                 simulation_fullpath = os.path.join(dir_path,output_simulation_file_name)
                 exposure_maxent_fullpath = os.path.join(dir_path,output_exposure_maxent_file_name)
@@ -527,7 +527,7 @@ def run_app(default_power=0.5,
                     #log_memory('run_app|download all|B')
                     mkpath(dir_path)
                     img.imsave(change_extension(wls_map_fullpath, ext_batch), image_np_wls_map)
-                    img.imsave(change_extension(L1_map_fullpath, ext_batch), image_np_L1_map)
+                    img.imsave(change_extension(tv_fullpath, ext_batch), image_np_tv)
                     img.imsave(change_extension(illumination_map_fullpath, ext_batch), illumination_map)
                     img.imsave(change_extension(fine_texture_map_fullpath, ext_batch), image_np_fine_texture_map)
                     img.imsave(change_extension(simulation_fullpath, ext_batch), image_np_simulation)
