@@ -1,5 +1,6 @@
 import numpy as np
 from PIL import Image
+import time
 import datetime
 import streamlit as st
 import psutil
@@ -27,6 +28,31 @@ def log_memory(ref_id):
     sys.stdout.flush()
 
 
+# def runtime(f):
+#     '''
+#     # decorator to measure performance of function f
+#     # Example:
+       
+#         @runtime
+#         def test(n):
+#             j = 0
+#             for i in range(n):
+#                 j+=1
+       
+#         >>> test(100000)
+#         runtime: 0.0050120 s
+
+#     '''
+#     def run(*args):
+#         start = datetime.datetime.now()
+#         out = f(*args)
+#         end = datetime.datetime.now()
+#         elapsed = (end-start).total_seconds()
+#         print(f'runtime: {elapsed:.7f} s')
+#         return out
+#     return run
+
+
 def runtime(f):
     '''
     # decorator to measure performance of function f
@@ -42,14 +68,16 @@ def runtime(f):
         runtime: 0.0050120 s
 
     '''
+    
     def run(*args):
-        start = datetime.datetime.now()
+        start = time.perf_counter_ns()
         out = f(*args)
-        end = datetime.datetime.now()
-        elapsed = (end-start).total_seconds()
-        print(f'runtime: {elapsed:.7f} s')
+        end = time.perf_counter_ns()
+        elapsed = end-start
+        print(f'runtime: {elapsed*1e-6:.4f} ms')
         return out
     return run
+
 
 def view_memory(f):
     '''

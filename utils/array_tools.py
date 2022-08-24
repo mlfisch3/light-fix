@@ -41,31 +41,36 @@ def geometric_mean(image):
 
 
 def autoscale_array(array):
+    '''
+    Returns array with values shifted and scaled to span interval [0,1]
+    Input returned unchanged if all zeros
+    '''
     #log_memory('autoscale_array||B')
     #array = array.astype(np.float32)
     lo = array.ravel().min()
     array -= lo    
     hi = array.ravel().max()
-    try:
-        assert hi > 0, f'autoscale_array cannot map null array to interval [0,1]'
-    except AssertionError as msg:
-        print(msg)
-        return array
-
-    array = array / hi
+    
+    if hi > 0:
+        array = array / hi
     #log_memory('autoscale_array||E')
     return array.astype(np.float32)
 
 def autoscale_arrays(A, B):
-
+    '''
+    Returns arrays with values shifted and scaled so that set of combined elements spans interval [0,1]
+    Inputs returned unchanged if all zeros
+    '''
     lo = np.hstack([A,B]).ravel().min()
     
     A = A - lo
     B = B - lo
 
     hi = np.hstack([A,B]).ravel().max()
-    A = A / hi
-    B = B / hi
+    if hi > 0:
+        A = A / hi
+        B = B / hi
+
     return A, B
 
 

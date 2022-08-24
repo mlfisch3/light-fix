@@ -1,9 +1,11 @@
 import streamlit as st
+from time import perf_counter_ns
 import numpy as np
 from scipy import signal
 from scipy.sparse import spdiags, csc_matrix
 from scipy.sparse.linalg import cg, spsolve, spilu, LinearOperator, use_solver
 from utils.array_tools import diff, cyclic_diff, imresize
+from utils.logging import runtime
 
 def delta(x):   
 
@@ -77,39 +79,133 @@ def calculate_texture_weights(image_01_maxRGB_reduced, kernel_shape=(5,1), sharp
         return gradient_v, gradient_h, texture_weights_v, texture_weights_h
 
 
-#@st.experimental_memo(show_spinner=False)
+@runtime
+# def construct_map_cyclic(texture_weights_v, texture_weights_h, lamda):
+#     ''' all cyclic elements present '''
+#     #log_memory('construct_map||B')  
+#     r, c = texture_weights_h.shape        
+#     k = r * c
+#     #texture_weights_h = np.asfortranarray(texture_weights_h.astype('float32'))
+#     #texture_weights_v = np.asfortranarray(texture_weights_v.astype('float32'))
+#     lamda = np.float32(lamda)
+
+#     dh = -lamda * texture_weights_h.flatten(order='F')
+#     dv = -lamda * texture_weights_v.flatten(order='F')
+
+#     texture_weights_h_permuted_cols = np.asfortranarray(np.roll(texture_weights_h,1,axis=1))
+#     dh_permuted_cols = -lamda * texture_weights_h_permuted_cols.flatten(order='F')
+#     texture_weights_v_permuted_rows = np.asfortranarray(np.roll(texture_weights_v,1,axis=0))
+#     dv_permuted_rows = -lamda * texture_weights_v_permuted_rows.flatten(order='F')
+       
+#     texture_weights_h_permuted_cols_head = np.zeros_like(texture_weights_h_permuted_cols, dtype='float32') 
+#     texture_weights_h_permuted_cols_head[:,0] = texture_weights_h_permuted_cols[:,0]
+#     dh_permuted_cols_head = -lamda * texture_weights_h_permuted_cols_head.flatten(order='F')
+    
+#     texture_weights_v_permuted_rows_head = np.zeros_like(texture_weights_v_permuted_rows, dtype='float32')
+#     texture_weights_v_permuted_rows_head[0,:] = texture_weights_v_permuted_rows[0,:]
+#     dv_permuted_rows_head = -lamda * texture_weights_v_permuted_rows_head.flatten(order='F')
+
+#     texture_weights_h_no_tail = np.zeros_like(texture_weights_h, dtype='float32')
+#     texture_weights_h_no_tail[:,:-1] = texture_weights_h[:,:-1]
+#     dh_no_tail = -lamda * texture_weights_h_no_tail.flatten(order='F')
+
+#     texture_weights_v_no_tail = np.zeros_like(texture_weights_v, dtype='float32')
+#     texture_weights_v_no_tail[:-1,:] = texture_weights_v[:-1,:]
+#     dv_no_tail = -lamda * texture_weights_v_no_tail.flatten(order='F')
+    
+#     Ah = spdiags([dh_permuted_cols_head, dh_no_tail], [-k+r, -r], k, k)
+    
+#     Av = spdiags([dv_permuted_rows_head, dv_no_tail], [-r+1,-1],  k, k)
+    
+#     A = 1 - (dh + dv + dh_permuted_cols + dv_permuted_rows)
+
+#     d = spdiags(A, 0, k, k)
+    
+#     A = Ah + Av
+#     A = A + A.T + d
+#     #log_memory('construct_map||E')  
+#     return A
+#     #return csc_matrix(A, dtype=np.float32)
+    
+# def construct_map_cyclic(texture_weights_v, texture_weights_h, lamda):
+#     ''' all cyclic elements present '''
+#     #log_memory('construct_map||B')  
+#     r, c = texture_weights_h.shape        
+#     k = r * c
+#     #texture_weights_h = np.asfortranarray(texture_weights_h.astype('float32'))
+#     #texture_weights_v = np.asfortranarray(texture_weights_v.astype('float32'))
+#     lamda = np.float32(lamda)
+
+#     dh = -lamda * texture_weights_h.ravel(order='F')
+#     dv = -lamda * texture_weights_v.ravel(order='F')
+
+#     texture_weights_h_permuted_cols = np.asfortranarray(np.roll(texture_weights_h,1,axis=1))
+#     dh_permuted_cols = -lamda * texture_weights_h_permuted_cols.ravel(order='F')
+#     texture_weights_v_permuted_rows = np.asfortranarray(np.roll(texture_weights_v,1,axis=0))
+#     dv_permuted_rows = -lamda * texture_weights_v_permuted_rows.ravel(order='F')
+       
+#     texture_weights_h_permuted_cols_head = np.zeros_like(texture_weights_h_permuted_cols, dtype='float32') 
+#     texture_weights_h_permuted_cols_head[:,0] = texture_weights_h_permuted_cols[:,0]
+#     dh_permuted_cols_head = -lamda * texture_weights_h_permuted_cols_head.ravel(order='F')
+    
+#     texture_weights_v_permuted_rows_head = np.zeros_like(texture_weights_v_permuted_rows, dtype='float32')
+#     texture_weights_v_permuted_rows_head[0,:] = texture_weights_v_permuted_rows[0,:]
+#     dv_permuted_rows_head = -lamda * texture_weights_v_permuted_rows_head.ravel(order='F')
+
+#     texture_weights_h_no_tail = np.zeros_like(texture_weights_h, dtype='float32')
+#     texture_weights_h_no_tail[:,:-1] = texture_weights_h[:,:-1]
+#     dh_no_tail = -lamda * texture_weights_h_no_tail.ravel(order='F')
+
+#     texture_weights_v_no_tail = np.zeros_like(texture_weights_v, dtype='float32')
+#     texture_weights_v_no_tail[:-1,:] = texture_weights_v[:-1,:]
+#     dv_no_tail = -lamda * texture_weights_v_no_tail.ravel(order='F')
+    
+#     Ah = spdiags([dh_permuted_cols_head, dh_no_tail], [-k+r, -r], k, k)
+    
+#     Av = spdiags([dv_permuted_rows_head, dv_no_tail], [-r+1,-1],  k, k)
+    
+#     A = 1 - (dh + dv + dh_permuted_cols + dv_permuted_rows)
+
+#     d = spdiags(A, 0, k, k)
+    
+#     A = Ah + Av
+#     A = A + A.T + d
+#     #log_memory('construct_map||E')  
+#     return A
+#     #return csc_matrix(A, dtype=np.float32)
+
 def construct_map_cyclic(texture_weights_v, texture_weights_h, lamda):
     ''' all cyclic elements present '''
     #log_memory('construct_map||B')  
     r, c = texture_weights_h.shape        
     k = r * c
-    texture_weights_h = texture_weights_h.astype('float32')
-    texture_weights_v = texture_weights_v.astype('float32')
+    texture_weights_h = np.asfortranarray(texture_weights_h.astype('float32'))
+    texture_weights_v = np.asfortranarray(texture_weights_v.astype('float32'))
     lamda = np.float32(lamda)
 
-    dh = -lamda * texture_weights_h.flatten(order='F')
-    dv = -lamda * texture_weights_v.flatten(order='F')
+    dh = -lamda * texture_weights_h.ravel(order='F')
+    dv = -lamda * texture_weights_v.ravel(order='F')
 
-    texture_weights_h_permuted_cols = np.roll(texture_weights_h,1,axis=1)
-    dh_permuted_cols = -lamda * texture_weights_h_permuted_cols.flatten(order='F')
-    texture_weights_v_permuted_rows = np.roll(texture_weights_v,1,axis=0)
-    dv_permuted_rows = -lamda * texture_weights_v_permuted_rows.flatten(order='F')
+    texture_weights_h_permuted_cols = np.asfortranarray(np.roll(texture_weights_h,1,axis=1))
+    dh_permuted_cols = -lamda * texture_weights_h_permuted_cols.ravel(order='F')
+    texture_weights_v_permuted_rows = np.asfortranarray(np.roll(texture_weights_v,1,axis=0))
+    dv_permuted_rows = -lamda * texture_weights_v_permuted_rows.ravel(order='F')
        
-    texture_weights_h_permuted_cols_head = np.zeros_like(texture_weights_h_permuted_cols, dtype='float32') 
+    texture_weights_h_permuted_cols_head = np.zeros_like(texture_weights_h_permuted_cols, dtype='float32', order='F') 
     texture_weights_h_permuted_cols_head[:,0] = texture_weights_h_permuted_cols[:,0]
-    dh_permuted_cols_head = -lamda * texture_weights_h_permuted_cols_head.flatten(order='F')
+    dh_permuted_cols_head = -lamda * texture_weights_h_permuted_cols_head.ravel(order='F')
     
-    texture_weights_v_permuted_rows_head = np.zeros_like(texture_weights_v_permuted_rows, dtype='float32')
+    texture_weights_v_permuted_rows_head = np.zeros_like(texture_weights_v_permuted_rows, dtype='float32', order='F')
     texture_weights_v_permuted_rows_head[0,:] = texture_weights_v_permuted_rows[0,:]
-    dv_permuted_rows_head = -lamda * texture_weights_v_permuted_rows_head.flatten(order='F')
+    dv_permuted_rows_head = -lamda * texture_weights_v_permuted_rows_head.ravel(order='F')
 
-    texture_weights_h_no_tail = np.zeros_like(texture_weights_h, dtype='float32')
+    texture_weights_h_no_tail = np.zeros_like(texture_weights_h, dtype='float32', order='F')
     texture_weights_h_no_tail[:,:-1] = texture_weights_h[:,:-1]
-    dh_no_tail = -lamda * texture_weights_h_no_tail.flatten(order='F')
+    dh_no_tail = -lamda * texture_weights_h_no_tail.ravel(order='F')
 
-    texture_weights_v_no_tail = np.zeros_like(texture_weights_v, dtype='float32')
+    texture_weights_v_no_tail = np.zeros_like(texture_weights_v, dtype='float32', order='F')
     texture_weights_v_no_tail[:-1,:] = texture_weights_v[:-1,:]
-    dv_no_tail = -lamda * texture_weights_v_no_tail.flatten(order='F')
+    dv_no_tail = -lamda * texture_weights_v_no_tail.ravel(order='F')
     
     Ah = spdiags([dh_permuted_cols_head, dh_no_tail], [-k+r, -r], k, k)
     
@@ -124,12 +220,11 @@ def construct_map_cyclic(texture_weights_v, texture_weights_h, lamda):
     #log_memory('construct_map||E')  
     return A
     #return csc_matrix(A, dtype=np.float32)
-
-
-
+ 
 #### Sparse solver function
 #@st.experimental_memo(show_spinner=False)
-def solve_sparse_system(A, B, method='cg', CG_prec='ILU', CG_TOL=0.1, LU_TOL=0.015, MAX_ITER=50, FILL=50, x0=None):
+#@runtime
+def solve_sparse_system(A, B, solver='cg', CG_prec='ILU', CG_TOL=0.1, LU_TOL=0.015, MAX_ITER=50, FILL=50, x0=None):
     """
     
     Consolidation of two functions into one:
@@ -145,10 +240,10 @@ def solve_sparse_system(A, B, method='cg', CG_prec='ILU', CG_TOL=0.1, LU_TOL=0.0
 
     r, c = B.shape
     
-    b = B.flatten(order='F').astype(np.float32)
+    b = np.asfortranarray(B).astype(np.float32).ravel(order='F')
     
     N = A.shape[0]
-    if method == 'cg': 
+    if solver == 'cg': 
         # solve using conjugate gradient descent
         if CG_prec == 'ILU':
             # with incomplete cholesky preconditioner
@@ -165,7 +260,7 @@ def solve_sparse_system(A, B, method='cg', CG_prec='ILU', CG_TOL=0.1, LU_TOL=0.0
         #log_memory('solver_sparse|cg|E')
         return cg(A, b, x0=x0, tol=CG_TOL, maxiter=MAX_ITER, M=M)[0].astype(np.float32).reshape(r,c, order='F')
 
-    elif method == 'direct':
+    elif solver == 'direct':
         #log_memory('solver_sparse|spsolve|E') 
         use_solver( useUmfpack = False ) # use single precision
         return spsolve(A, b).astype(np.float32).reshape(r,c, order='F')
@@ -182,13 +277,22 @@ def smooth(image_01_maxRGB_reduced, restore_shape, texture_style='I', kernel_sha
     
     ############ ILLUMINATION MAP  ###########################
     #log_memory('bimef|construct_map|B')
+    start = perf_counter_ns()
     A = construct_map_cyclic(texture_weights_v, texture_weights_h, lamda) 
+    end = perf_counter_ns()
+    elapsed = end-start
+    print(f'runtime [construct_map_cyclic]: {elapsed*1e-6:.4f} ms')
+
     #log_memory('bimef|construct_map|E')
     ######################################################
     
     ############ SOLVE SPARSE SYSTEM:  ###########################  # 20220716:  solve_linear_equation replaced by solve_sparse_system
     #log_memory('bimef|solve_sparse_system|B')
-    image_01_maxRGB_reduced_smooth = solve_sparse_system(A, image_01_maxRGB_reduced, method=solver, CG_prec=CG_prec, CG_TOL=CG_TOL, LU_TOL=LU_TOL, MAX_ITER=MAX_ITER, FILL=FILL, x0=None)
+    start = perf_counter_ns()
+    image_01_maxRGB_reduced_smooth = solve_sparse_system(A, image_01_maxRGB_reduced, solver=solver, CG_prec=CG_prec, CG_TOL=CG_TOL, LU_TOL=LU_TOL, MAX_ITER=MAX_ITER, FILL=FILL, x0=None)
+    end = perf_counter_ns()
+    elapsed = end-start
+    print(f'runtime [solve_sparse_system]: {elapsed*1e-6:.4f} ms')
     #log_memory('bimef|solve_sparse_system|E')
     ######################################################
     

@@ -1,9 +1,9 @@
 import streamlit as st
-
+import subprocess
 #DEFAULT_DIR_PATH = f'C:\GIT_REPOS\BIMEF_MF{VERSION}\DOWNLOADS'
 DEFAULT_DIR_PATH = f'DOWNLOADS'
 
-#st.write(st.session_state)
+
 import cv2
 import numpy as np
 from matplotlib import image as img
@@ -133,16 +133,28 @@ def full_reset():
     st.session_state.full_clear = True
     gc.collect()
 
+   
+    
+def run_command(command):
+
+    st.session_state.command = str(command)
+    st.session_state.console_out = str(subprocess.check_output(st.session_state.command, shell=True, text=True))
+
+
+    print(f'[{timestamp()}] session_state.command: {st.session_state.command}')
+    print(f'[{timestamp()}] session_state.console_out: {st.session_state.console_out}')
+
+
 def run_app(default_power=0.5, 
             default_smoothness=0.3, 
             default_texture_style='I',
             default_kernel_parallel=5, 
             default_kernel_orthogonal=1,
             default_sharpness=0.001,
-            CG_TOL=0.1, 
-            LU_TOL=0.015, 
-            MAX_ITER=50, 
-            FILL=50,
+            CG_TOL=0.2,#0.1, 
+            LU_TOL=0.03,#0.015, 
+            MAX_ITER=30,#50,
+            FILL=25,#50,
             default_dim_size=(50), 
             default_dim_threshold=0.5, 
             default_a=-0.3293, 
@@ -152,7 +164,8 @@ def run_app(default_power=0.5,
             default_exposure_ratio=-1, 
             default_color_gamma=0.3981):
 
-    
+
+
     if 'full_clear' not in st.session_state:
         st.session_state.full_clear = False
 
@@ -162,19 +175,38 @@ def run_app(default_power=0.5,
     if 'input_file_name' not in st.session_state:
         st.session_state.input_file_name = ''
 
+    if 'console_out' not in st.session_state:
+        st.session_state.console_out = ''
+
+    if 'command' not in st.session_state:
+        st.session_state.command = ''
+
     #log_memory('run_app||B')
 
+    st.write(st.session_state)
+
     with st.sidebar:
-    
-        with st.expander("Reset App"):
-            with st.form("Apply"):
-                st.form_submit_button("Reset Now", on_click=full_reset)
-                if st.session_state.full_clear:
-                    st.session_state.full_clear = False
-                    st.experimental_rerun()
+
+#        with st.expander("Console"):
+        with st.form('console'):
+            command = st.text_input("in")
+            console_out = str(subprocess.check_output(command, shell=True, text=True))
+            submitted = st.form_submit_button('run')#, on_click=run_command, args=[command])
+
+        # st.write(f'IN: {st.session_state.command}')
+        # st.text(f'OUT: {st.session_state.console_out}')
+            st.write(f'IN: {command}')
+            st.text(f'OUT: {console_out}')
+
+       # with st.expander("Reset App"):
+            # with st.form("Apply"):
+            #     st.form_submit_button("Reset Now", on_click=full_reset)
+            #     if st.session_state.full_clear:
+            #         st.session_state.full_clear = False
+            #         st.experimental_rerun()
 
         # logging = st.radio("Process Log:", ('OFF', 'ON'), on_click=set_logging, args=)
-        input_selection = st.radio("Select Example:", ('scrapyard', 'selfie', 'cylinder', 'park', 'school', 'spiral'), horizontal=True, on_change=reset)
+        input_selection = st.radio("Select Example:", ('scrapyard', 'selfie', 'cylinder', 'park', 'school', 'spiral'), horizontal=True)#, on_change=reset)
         example_paths = {'scrapyard': SCRAPYARD_FILE_PATH, 'selfie': SELFIE_FILE_PATH, 'cylinder': CYLINDER_FILE_PATH, 'park':PARK_FILE_PATH, 'school':SCHOOL_FILE_PATH, 'spiral':SPIRAL_FILE_PATH}
         IMAGE_EXAMPLE_PATH = example_paths[input_selection]
 
@@ -185,6 +217,8 @@ def run_app(default_power=0.5,
         fImage = st.file_uploader("Or Upload Your Own Image:", on_change=reset) #("Process new image:")
         #log_memory('run_app|file_uploader|E')
         ################################################################################################
+
+
 
         with st.expander("Parameter Settings"):
             with st.form('Parameter Settings'):
