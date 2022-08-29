@@ -1,9 +1,9 @@
 import streamlit as st
-import subprocess
+
 #DEFAULT_DIR_PATH = f'C:\GIT_REPOS\BIMEF_MF{VERSION}\DOWNLOADS'
 DEFAULT_DIR_PATH = f'DOWNLOADS'
 
-
+#st.write(st.session_state)
 import cv2
 import numpy as np
 from matplotlib import image as img
@@ -19,71 +19,6 @@ from utils.sodef import bimef
 from utils.array_tools import float32_to_uint8, uint8_to_float32, normalize_array, array_info
 from utils.logging import timestamp
 
-# def reset_calculation(condition, x):
-#     if st.session_state.live_updates == 'Automatic':
-#         del st.session_state['ai_out']
-
-# def reset_calculation(condition, x):
-#     if st.session_state.live_updates == 'Automatic':
-#         del st.session_state[x]
-
-# def update_state(name, value):
-#     if name not in st.session_state:
-#         st.session_state.name = value
-
-#@st.experimental_memo
-def adjust_intensity(array, 
-                     exposure_ratio=-1, 
-                     enhance=0.8, 
-                     a=-0.3293, 
-                     b=1.1258, 
-                     lamda=0.3, 
-                     texture_style='I',
-                     kernel_shape=(5,1), 
-                     scale=0.1, 
-                     sharpness=0.001, 
-                     dim_threshold=0.5, 
-                     dim_size=(50,50), 
-                     solver='cg', 
-                     CG_prec='ILU', 
-                     CG_TOL=0.1, 
-                     LU_TOL=0.015, 
-                     MAX_ITER=50, 
-                     FILL=50, 
-                     lo=1, 
-                     hi=7, 
-                     color_gamma=0.5, 
-                     npoints=20, 
-                     return_texture_weights=True
-                     ):
-    
-    '''
-    Wrapper for function bimef(). Exists in order to avoid hard-coding a particular set of numerical default values in the definition of bimef()
-    '''
-
-    return bimef(array[:,:,[2,1,0]], 
-                 exposure_ratio=exposure_ratio, 
-                 enhance=enhance, 
-                 a=a, 
-                 b=b, 
-                 lo=lo, 
-                 hi=hi, 
-                 lamda=lamda,
-                 texture_style=texture_style,
-                 kernel_shape=kernel_shape, 
-                 scale=scale, 
-                 sharpness=sharpness, 
-                 dim_threshold=dim_threshold, 
-                 dim_size=dim_size, 
-                 solver=solver, 
-                 CG_prec='ILU', 
-                 CG_TOL=CG_TOL, 
-                 LU_TOL=LU_TOL, 
-                 MAX_ITER=MAX_ITER, 
-                 FILL=FILL, 
-                 color_gamma=color_gamma, 
-                 npoints=npoints, 
-                 return_texture_weights=return_texture_weights) 
 
 SCRAPYARD_FILE_NAME = 'scrapyard.jpg'
 SELFIE_FILE_NAME = 'selfie.jpg'
@@ -133,28 +68,16 @@ def full_reset():
     st.session_state.full_clear = True
     gc.collect()
 
-   
-    
-def run_command(command):
-
-    st.session_state.command = str(command)
-    st.session_state.console_out = str(subprocess.check_output(st.session_state.command, shell=True, text=True))
-
-
-    print(f'[{timestamp()}] session_state.command: {st.session_state.command}')
-    print(f'[{timestamp()}] session_state.console_out: {st.session_state.console_out}')
-
-
 def run_app(default_power=0.5, 
             default_smoothness=0.3, 
             default_texture_style='I',
             default_kernel_parallel=5, 
             default_kernel_orthogonal=1,
             default_sharpness=0.001,
-            CG_TOL=0.2,#0.1, 
-            LU_TOL=0.03,#0.015, 
-            MAX_ITER=30,#50,
-            FILL=25,#50,
+            CG_TOL=0.1, 
+            LU_TOL=0.015, 
+            MAX_ITER=50, 
+            FILL=50,
             default_dim_size=(50), 
             default_dim_threshold=0.5, 
             default_a=-0.3293, 
@@ -164,8 +87,7 @@ def run_app(default_power=0.5,
             default_exposure_ratio=-1, 
             default_color_gamma=0.3981):
 
-
-
+    
     if 'full_clear' not in st.session_state:
         st.session_state.full_clear = False
 
@@ -175,38 +97,19 @@ def run_app(default_power=0.5,
     if 'input_file_name' not in st.session_state:
         st.session_state.input_file_name = ''
 
-    if 'console_out' not in st.session_state:
-        st.session_state.console_out = ''
-
-    if 'command' not in st.session_state:
-        st.session_state.command = ''
-
     #log_memory('run_app||B')
 
-    st.write(st.session_state)
-
     with st.sidebar:
-
-#        with st.expander("Console"):
-        with st.form('console'):
-            command = st.text_input("in")
-            console_out = str(subprocess.check_output(command, shell=True, text=True))
-            submitted = st.form_submit_button('run')#, on_click=run_command, args=[command])
-
-        # st.write(f'IN: {st.session_state.command}')
-        # st.text(f'OUT: {st.session_state.console_out}')
-            st.write(f'IN: {command}')
-            st.text(f'OUT: {console_out}')
-
-       # with st.expander("Reset App"):
-            # with st.form("Apply"):
-            #     st.form_submit_button("Reset Now", on_click=full_reset)
-            #     if st.session_state.full_clear:
-            #         st.session_state.full_clear = False
-            #         st.experimental_rerun()
+    
+        with st.expander("Reset App"):
+            with st.form("Apply"):
+                st.form_submit_button("Reset Now", on_click=full_reset)
+                if st.session_state.full_clear:
+                    st.session_state.full_clear = False
+                    st.experimental_rerun()
 
         # logging = st.radio("Process Log:", ('OFF', 'ON'), on_click=set_logging, args=)
-        input_selection = st.radio("Select Example:", ('scrapyard', 'selfie', 'cylinder', 'park', 'school', 'spiral'), horizontal=True)#, on_change=reset)
+        input_selection = st.radio("Select Example:", ('scrapyard', 'selfie', 'cylinder', 'park', 'school', 'spiral'), horizontal=True, on_change=reset)
         example_paths = {'scrapyard': SCRAPYARD_FILE_PATH, 'selfie': SELFIE_FILE_PATH, 'cylinder': CYLINDER_FILE_PATH, 'park':PARK_FILE_PATH, 'school':SCHOOL_FILE_PATH, 'spiral':SPIRAL_FILE_PATH}
         IMAGE_EXAMPLE_PATH = example_paths[input_selection]
 
@@ -217,8 +120,6 @@ def run_app(default_power=0.5,
         fImage = st.file_uploader("Or Upload Your Own Image:", on_change=reset) #("Process new image:")
         #log_memory('run_app|file_uploader|E')
         ################################################################################################
-
-
 
         with st.expander("Parameter Settings"):
             with st.form('Parameter Settings'):
@@ -272,26 +173,41 @@ def run_app(default_power=0.5,
         start = datetime.datetime.now()
         #log_memory('run_app|adjust_intensity|B')
 
-        ai_out = adjust_intensity(image_np, 
-                                   exposure_ratio=exposure_ratio, 
-                                   scale=granularity, 
-                                   enhance=power, 
-                                   lamda=smoothness, 
-                                   a=a, 
-                                   b=b, 
-                                   lo=lo, 
-                                   hi=hi,
-                                   texture_style=texture_style, 
-                                   kernel_shape=(kernel_parallel, kernel_orthogonal),
-                                   sharpness=sharpness, 
-                                   color_gamma=color_gamma,
-                                   CG_TOL=cg_tol, 
-                                   LU_TOL=lu_tol, 
-                                   MAX_ITER=max_iter, 
-                                   FILL=fill,
-                                   return_texture_weights=True)
+        data_grayscale, data_rgb, exposure_ratio = bimef(image_np[:,:,[2,1,0]], 
+                                                       exposure_ratio=exposure_ratio, 
+                                                       scale=granularity, 
+                                                       power=power, 
+                                                       lamda=smoothness, 
+                                                       a=a, 
+                                                       b=b, 
+                                                       lo=lo, 
+                                                       hi=hi,
+                                                       texture_style=texture_style, 
+                                                       kernel_shape=(kernel_parallel, kernel_orthogonal),
+                                                       sharpness=sharpness, 
+                                                       color_gamma=color_gamma,
+                                                       CG_TOL=cg_tol, 
+                                                       LU_TOL=lu_tol, 
+                                                       MAX_ITER=max_iter, 
+                                                       FILL=fill,
+                                                       return_texture_weights=True)
 
-        image_np_maxRGB, image_np_gradient_v, image_np_gradient_h, image_np_texture_weights_v, image_np_texture_weights_h, illumination_map, fusion_weights, image_exposure_maxent, image_np_simulation, image_np_fused, exposure_ratio = ai_out
+        # greyscale float32
+        image_np_maxRGB = data_grayscale[0]
+        image_np_gradient_v = data_grayscale[1]
+        image_np_gradient_h = data_grayscale[2]
+        image_np_texture_weights_v = data_grayscale[3]
+        image_np_texture_weights_h = data_grayscale[4]
+        illumination_map = data_grayscale[5]
+        fusion_weights = data_grayscale[6]
+
+        # rgb uint8
+        image_uint8 = data_rgb[0]
+        image_exposure_maxent = data_rgb[1]
+        image_np_simulation = data_rgb[2]
+        image_np_fused = data_rgb[3]
+
+        #image_np_maxRGB, image_np_gradient_v, image_np_gradient_h, image_np_texture_weights_v, image_np_texture_weights_h, illumination_map, fusion_weights, image_exposure_maxent, image_np_simulation, image_np_fused, exposure_ratio = ai_out
         titles = ['image_np_maxRGB', 'image_np_gradient_v', 'image_np_gradient_h', 'image_np_texture_weights_v', 'image_np_texture_weights_h', 'illumination_map', 'fusion_weights', 'image_exposure_maxent', 'image_np_simulation', 'image_np_fused']
 
         #log_memory('run_app|adjust_intensity|E')
@@ -301,14 +217,14 @@ def run_app(default_power=0.5,
         sys.stdout.flush()
         #########################################################################################################
 
-        image_np_tv = np.abs(image_np_gradient_v * image_np_texture_weights_v + image_np_gradient_h * image_np_texture_weights_h)
-        image_np_tv = image_np_tv.clip(min=0, max=image_np_tv.ravel().mean()+image_np_tv.ravel().std())
-        image_np_tv = float32_to_uint8(normalize_array(image_np_tv))
-        image_np_tv = np.tile(image_np_tv.T, (3,1,1)).T
+        image_np_L1_map = np.abs(image_np_gradient_v * image_np_texture_weights_v + image_np_gradient_h * image_np_texture_weights_h)
+        image_np_L1_map = image_np_L1_map.clip(min=0, max=image_np_L1_map.flatten().mean()+image_np_L1_map.flatten().std())
+        image_np_L1_map = float32_to_uint8(normalize_array(image_np_L1_map))
+        image_np_L1_map = np.tile(image_np_L1_map.T, (3,1,1)).T
 
         image_np_wls_map = (image_np_texture_weights_v + image_np_texture_weights_h)/2
-        image_np_wls_map_med = image_np_wls_map.ravel().mean()
-        image_np_wls_map_std = image_np_wls_map.ravel().std()
+        image_np_wls_map_med = image_np_wls_map.flatten().mean()
+        image_np_wls_map_std = image_np_wls_map.flatten().std()
         image_np_wls_map = image_np_wls_map.clip(min=image_np_wls_map_med-image_np_wls_map_std, max=image_np_wls_map_med+image_np_wls_map_std)
         image_np_wls_map = float32_to_uint8(normalize_array(image_np_wls_map))
         image_np_wls_map = np.tile(image_np_wls_map.T, (3,1,1)).T
@@ -338,11 +254,10 @@ def run_app(default_power=0.5,
         fusion_param_str = smooth_param_str + f'_{color_gamma*100:.0f}_{power*100:.0f}_{-a*1000:.0f}_{b*1000:.0f}_{exposure_ratio*100:.0f}'
 
         #input_file_name = str(fImage.__dict__['name'])
-        input_file_basename = input_file_name.split('/')[-1]
-        input_file_ext = '.' + input_file_basename.split('.')[-1]
-        input_file_basename = input_basename.replace(input_file_ext, '')
+        input_file_ext = '.' + str(input_file_name.split('.')[-1])
+        input_file_basename = input_file_name.replace(input_file_ext, '')
         output_wls_map_file_name = input_file_basename + '_WLS' + texture_param_str + input_file_ext
-        output_tv_file_name = input_file_basename + '_L1' + texture_param_str + input_file_ext
+        output_L1_map_file_name = input_file_basename + '_L1' + texture_param_str + input_file_ext
         output_fine_texture_map_file_name = input_file_basename + '_FTM' + smooth_param_str + input_file_ext
         output_illumination_map_file_name = input_file_basename + '_ILL' + smooth_param_str + input_file_ext
         output_simulation_file_name = input_file_basename + '_SIM' + fusion_param_str + input_file_ext
@@ -350,19 +265,6 @@ def run_app(default_power=0.5,
         output_fusion_weights_file_name = input_file_basename + '_FW' + fusion_param_str + input_file_ext
         output_fused_file_name = input_file_basename + '_FUSION' + fusion_param_str + input_file_ext
         
-# image_np[:,:,[2,1,0]]
-# image_np_wls_map
-# image_np_tv
-# image_np_simulation
-# illumination_map
-# fusion_weights
-# image_np_fused
-# image_exposure_maxent
-# image_np_fine_texture_map
-
-
-
-
 
         with col1:        
             
@@ -397,16 +299,16 @@ def run_app(default_power=0.5,
                 ###########################
                 st.markdown("<h3 style='text-align: center; color: white;'>Total Variation</h3>", unsafe_allow_html=True)
                 #log_memory('run_app|st.image|B')
-                st.image(image_np_tv, clamp=True)
+                st.image(image_np_L1_map, clamp=True)
                 #log_memory('run_app|st.image|E')
 
-                output_tv_file_name = st.text_input('Download Total Variation As', output_tv_file_name)
-                ext = '.' + output_tv_file_name.split('.')[-1]
+                output_L1_map_file_name = st.text_input('Download Total Variation', output_L1_map_file_name)
+                ext = '.' + output_L1_map_file_name.split('.')[-1]
                 #log_memory('run_app|cv2.imencode|B')
-                image_np_tv_binary = cv2.imencode(ext, image_np_tv[:,:,[2,1,0]])[1].tobytes()
+                image_np_L1_map_binary = cv2.imencode(ext, image_np_L1_map[:,:,[2,1,0]])[1].tobytes()
                 #log_memory('run_app|cv2.imencode|E')
 
-                button = st.download_button(label = "Download Total Variation", data = image_np_tv_binary, file_name = output_tv_file_name, mime = "image/png")
+                button = st.download_button(label = "Download Total Variation", data = image_np_L1_map_binary, file_name = output_L1_map_file_name, mime = "image/png")
 
         with col2:
         ###########################
@@ -535,7 +437,6 @@ def run_app(default_power=0.5,
                                                    Helps protect the app from exceeding available memory resources. \
                                                    Might cause longer processing times."
                                                    )                                                 
-                gc.collect()
                 pid = getpid()
                 mem = Process(pid).memory_info()[0]/float(2**20)
                 virt = virtual_memory()[3]/float(2**20)
@@ -561,7 +462,7 @@ def run_app(default_power=0.5,
 
                 illumination_map_fullpath = os.path.join(dir_path,output_illumination_map_file_name)
                 wls_map_fullpath = os.path.join(dir_path, output_wls_map_file_name)
-                tv_fullpath = os.path.join(dir_path, output_tv_file_name)
+                L1_map_fullpath = os.path.join(dir_path, output_L1_map_file_name)
                 fine_texture_map_fullpath = os.path.join(dir_path, output_fine_texture_map_file_name)
                 simulation_fullpath = os.path.join(dir_path,output_simulation_file_name)
                 exposure_maxent_fullpath = os.path.join(dir_path,output_exposure_maxent_file_name)
@@ -575,7 +476,7 @@ def run_app(default_power=0.5,
                     #log_memory('run_app|download all|B')
                     mkpath(dir_path)
                     img.imsave(change_extension(wls_map_fullpath, ext_batch), image_np_wls_map)
-                    img.imsave(change_extension(tv_fullpath, ext_batch), image_np_tv)
+                    img.imsave(change_extension(L1_map_fullpath, ext_batch), image_np_L1_map)
                     img.imsave(change_extension(illumination_map_fullpath, ext_batch), illumination_map)
                     img.imsave(change_extension(fine_texture_map_fullpath, ext_batch), image_np_fine_texture_map)
                     img.imsave(change_extension(simulation_fullpath, ext_batch), image_np_simulation)
