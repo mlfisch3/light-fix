@@ -126,7 +126,7 @@ def calculate_texture_weights(image_01_maxRGB_reduced, kernel_shape=(5,1), sharp
 #     #log_memory('construct_map||E')  
 #     return A
 #     #return csc_matrix(A, dtype=np.float32)
-    
+
 # def construct_map_cyclic(texture_weights_v, texture_weights_h, lamda):
 #     ''' all cyclic elements present '''
 #     #log_memory('construct_map||B')  
@@ -174,6 +174,7 @@ def calculate_texture_weights(image_01_maxRGB_reduced, kernel_shape=(5,1), sharp
 #     return A
 #     #return csc_matrix(A, dtype=np.float32)
 
+# USED in currently running streamlit version
 def construct_map_cyclic(texture_weights_v, texture_weights_h, lamda):
     ''' all cyclic elements present '''
     #log_memory('construct_map||B')  
@@ -220,7 +221,8 @@ def construct_map_cyclic(texture_weights_v, texture_weights_h, lamda):
     #log_memory('construct_map||E')  
     return A
     #return csc_matrix(A, dtype=np.float32)
- 
+
+
 #### Sparse solver function
 #@st.experimental_memo(show_spinner=False)
 #@runtime

@@ -4,7 +4,7 @@ import streamlit as st
 
 MAX_ENTRIES = 20
 
-from utils.array_tools import float32_to_uint8, imresize, autoscale_array
+from utils.array_tools import float32_to_uint8, imresize, normalize_array
 from utils.logging import timestamp
 from utils.edge_preserving_smoother import smooth
 from utils.exposure import adjust_exposure
@@ -43,7 +43,7 @@ def bimef(image,
     tic = datetime.datetime.now()
 
     #log_memory('bimef|image_01|B')
-    image_01 = autoscale_array(image)
+    image_01 = normalize_array(image)
     #log_memory('bimef|image_01|E')
 
     #log_memory('bimef|image_01_maxRGB|B')

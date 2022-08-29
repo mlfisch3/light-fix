@@ -16,7 +16,7 @@ import gc
 from PIL import Image, ImageOps
 from utils.io_tools import change_extension, load_binary, mkpath
 from utils.sodef import bimef
-from utils.array_tools import float32_to_uint8, uint8_to_float32, autoscale_array, array_info
+from utils.array_tools import float32_to_uint8, uint8_to_float32, normalize_array, array_info
 from utils.logging import timestamp
 
 # def reset_calculation(condition, x):
@@ -303,14 +303,14 @@ def run_app(default_power=0.5,
 
         image_np_tv = np.abs(image_np_gradient_v * image_np_texture_weights_v + image_np_gradient_h * image_np_texture_weights_h)
         image_np_tv = image_np_tv.clip(min=0, max=image_np_tv.ravel().mean()+image_np_tv.ravel().std())
-        image_np_tv = float32_to_uint8(autoscale_array(image_np_tv))
+        image_np_tv = float32_to_uint8(normalize_array(image_np_tv))
         image_np_tv = np.tile(image_np_tv.T, (3,1,1)).T
 
         image_np_wls_map = (image_np_texture_weights_v + image_np_texture_weights_h)/2
         image_np_wls_map_med = image_np_wls_map.ravel().mean()
         image_np_wls_map_std = image_np_wls_map.ravel().std()
         image_np_wls_map = image_np_wls_map.clip(min=image_np_wls_map_med-image_np_wls_map_std, max=image_np_wls_map_med+image_np_wls_map_std)
-        image_np_wls_map = float32_to_uint8(autoscale_array(image_np_wls_map))
+        image_np_wls_map = float32_to_uint8(normalize_array(image_np_wls_map))
         image_np_wls_map = np.tile(image_np_wls_map.T, (3,1,1)).T
 
         image_np_fine_texture_map = float32_to_uint8(image_np_maxRGB - illumination_map)
@@ -338,8 +338,9 @@ def run_app(default_power=0.5,
         fusion_param_str = smooth_param_str + f'_{color_gamma*100:.0f}_{power*100:.0f}_{-a*1000:.0f}_{b*1000:.0f}_{exposure_ratio*100:.0f}'
 
         #input_file_name = str(fImage.__dict__['name'])
-        input_file_ext = '.' + str(input_file_name.split('.')[-1])
-        input_file_basename = input_file_name.replace(input_file_ext, '')
+        input_file_basename = input_file_name.split('/')[-1]
+        input_file_ext = '.' + input_file_basename.split('.')[-1]
+        input_file_basename = input_basename.replace(input_file_ext, '')
         output_wls_map_file_name = input_file_basename + '_WLS' + texture_param_str + input_file_ext
         output_tv_file_name = input_file_basename + '_L1' + texture_param_str + input_file_ext
         output_fine_texture_map_file_name = input_file_basename + '_FTM' + smooth_param_str + input_file_ext
@@ -349,6 +350,19 @@ def run_app(default_power=0.5,
         output_fusion_weights_file_name = input_file_basename + '_FW' + fusion_param_str + input_file_ext
         output_fused_file_name = input_file_basename + '_FUSION' + fusion_param_str + input_file_ext
         
+# image_np[:,:,[2,1,0]]
+# image_np_wls_map
+# image_np_tv
+# image_np_simulation
+# illumination_map
+# fusion_weights
+# image_np_fused
+# image_exposure_maxent
+# image_np_fine_texture_map
+
+
+
+
 
         with col1:        
             

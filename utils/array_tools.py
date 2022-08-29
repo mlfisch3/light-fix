@@ -40,12 +40,12 @@ def geometric_mean(image):
     return np.power(np.prod(image, axis=image.ndim-1), 1./(image.ndim-1.))
 
 
-def autoscale_array(array):
+def normalize_array(array):
     '''
     Returns array with values shifted and scaled to span interval [0,1]
     Input returned unchanged if all zeros
     '''
-    #log_memory('autoscale_array||B')
+    #log_memory('normalize_array||B')
     #array = array.astype(np.float32)
     lo = array.ravel().min()
     array -= lo    
@@ -53,10 +53,10 @@ def autoscale_array(array):
     
     if hi > 0:
         array = array / hi
-    #log_memory('autoscale_array||E')
+    #log_memory('normalize_array||E')
     return array.astype(np.float32)
 
-def autoscale_arrays(A, B):
+def normalize_arrays(A, B):
     '''
     Returns arrays with values shifted and scaled so that set of combined elements spans interval [0,1]
     Inputs returned unchanged if all zeros

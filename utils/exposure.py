@@ -2,7 +2,7 @@ import numpy as np
 import streamlit as st
 
 from utils.array_entropy import entropy
-from utils.array_tools import geometric_mean, imresize, autoscale_array
+from utils.array_tools import geometric_mean, imresize, normalize_array
 
 #### Exposure Functions
 #@st.experimental_memo(show_spinner=False)
@@ -51,9 +51,9 @@ def optimize_exposure_ratio(array, a, b, lo=1, hi=7, npoints=20):
 
 #@st.experimental_memo(show_spinner=False)
 def adjust_exposure(image, illumination_map, a, b, exposure_ratio=-1, dim_threshold=0.5, dim_size=(50,50), lo=1, hi=7, npoints=20, color_gamma=0.3981, verbose=False):
-    #log_memory('bimef|autoscale_array|B')
-    image_01 = autoscale_array(image)
-    #log_memory('bimef|autoscale_array|E')
+    #log_memory('bimef|normalize_array|B')
+    image_01 = normalize_array(image)
+    #log_memory('bimef|normalize_array|E')
     #log_memory('bimef|np.zeros_like|B')
     dim_pixels = np.zeros_like(illumination_map)
     #log_memory('bimef|np.zeros_like|E')
