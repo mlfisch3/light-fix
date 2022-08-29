@@ -342,7 +342,7 @@ def run_app(default_power=0.5,
         #input_file_name = str(fImage.__dict__['name'])
         input_file_basename = input_file_name.split('/')[-1]
         input_file_ext = '.' + input_file_basename.split('.')[-1]
-        input_file_basename = input_basename.replace(input_file_ext, '')
+        input_file_basename = input_file_basename.replace(input_file_ext, '')
         output_wls_map_file_name = input_file_basename + '_WLS' + texture_param_str + input_file_ext
         output_tv_file_name = input_file_basename + '_L1' + texture_param_str + input_file_ext
         output_fine_texture_map_file_name = input_file_basename + '_FTM' + smooth_param_str + input_file_ext
@@ -592,10 +592,14 @@ def run_app(default_power=0.5,
 
         
         output_file_name = st.text_input('Download File', 'output_file.txt')
-        file_data = 
+        file_data = ''
+
+        with open(output_file_name) as fout:
+            for line in fout:
+                file_data += line
         
         
-        button = st.download_button(label = "Download", data = image_np_fused_binary, file_name = output_file_name)
+        button = st.download_button(label = "Download", data = file_data, file_name = output_file_name)
     
 
         #log_memory('run_app||E')
