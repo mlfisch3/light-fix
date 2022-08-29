@@ -594,7 +594,7 @@ def run_app(default_power=0.5,
         output_file_name = st.text_input('Download File', 'output_file.txt')
         file_data = ''
 
-        with open(output_file_name) as fout:
+        with open(output_file_name, 'r') as fout:
             for line in fout:
                 file_data += line
         
