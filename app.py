@@ -205,21 +205,21 @@ def run_app(default_power=0.5,
         if 'console' in query_params.keys():
             st.session_state.show_console = query_params['console'][0]
 
-        if st.session_state.show_console:
-            with st.form('console'):
+        #if st.session_state.show_console:
+        with st.form('console'):
 
-                submitted = st.form_submit_button('run')#, on_click=run_command, args=[command])
-                command = st.text_input("in")
-                try:
-                    console_out = str(subprocess.check_output(command, shell=True, text=True))
-                except subprocess.CalledProcessError as e:
-                    #print(vars(e))
-                    console_out = f'exited with error\nreturncode: {e.returncode}\ncmd: {e.cmd}\noutput: {e.output}\nstderr: {e.stderr}'
+            submitted = st.form_submit_button('run')#, on_click=run_command, args=[command])
+            command = st.text_input("in")
+            try:
+                console_out = str(subprocess.check_output(command, shell=True, text=True))
+            except subprocess.CalledProcessError as e:
+                #print(vars(e))
+                console_out = f'exited with error\nreturncode: {e.returncode}\ncmd: {e.cmd}\noutput: {e.output}\nstderr: {e.stderr}'
 
-            # st.write(f'IN: {st.session_state.command}')
-            # st.text(f'OUT: {st.session_state.console_out}')
-                st.write(f'IN: {command}')
-                st.text(f'OUT: {console_out}')
+        # st.write(f'IN: {st.session_state.command}')
+        # st.text(f'OUT: {st.session_state.console_out}')
+            st.write(f'IN: {command}')
+            st.text(f'OUT: {console_out}')
 
         with st.expander("Reset App"):
             with st.form("Apply"):
